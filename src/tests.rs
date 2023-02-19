@@ -1,3 +1,4 @@
+
 macro_rules! x10 {
     ($function:ident) => {
         std::hint::black_box($function());
