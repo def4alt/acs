@@ -58,8 +58,21 @@ fn run_basic_ops<T: Num + Copy + Bounded>() -> Vec<Test> {
 }
 
 fn main() {
-    let mut tests: Vec<Test> =
-        call_for_each_type!(run_basic_ops, i128, i64, i32, i16, i8, f64, f32);
+    let mut tests: Vec<Test> = call_for_each_type!(
+        run_basic_ops,
+        i128,
+        i64,
+        i32,
+        i16,
+        i8,
+        u128,
+        u64,
+        u32,
+        u16,
+        u8,
+        f64,
+        f32
+    );
 
     let max = tests.iter().map(|t| t.ops_pro_ns).reduce(f64::max).unwrap();
 
