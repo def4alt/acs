@@ -16,49 +16,49 @@ macro_rules! x10 {
 
 macro_rules! x100 {
     ($function:ident) => {
-        x10!($function);    
-        x10!($function);   
-        x10!($function);    
-        x10!($function);    
-        x10!($function);    
+        x10!($function);
+        x10!($function);
+        x10!($function);
+        x10!($function);
+        x10!($function);
 
-        x10!($function);    
-        x10!($function);    
-        x10!($function);    
-        x10!($function);    
-        x10!($function);    
+        x10!($function);
+        x10!($function);
+        x10!($function);
+        x10!($function);
+        x10!($function);
     };
 }
 
 macro_rules! x1000 {
     ($function:ident) => {
-        x100!($function);    
-        x100!($function);   
-        x100!($function);    
-        x100!($function);    
-        x100!($function);    
+        x100!($function);
+        x100!($function);
+        x100!($function);
+        x100!($function);
+        x100!($function);
 
-        x100!($function);    
-        x100!($function);    
-        x100!($function);    
-        x100!($function);    
-        x100!($function);    
+        x100!($function);
+        x100!($function);
+        x100!($function);
+        x100!($function);
+        x100!($function);
     };
 }
 
 macro_rules! x10000 {
     ($function:ident) => {
-        x1000!($function);    
-        x1000!($function);   
-        x1000!($function);    
-        x1000!($function);    
-        x1000!($function);    
+        x1000!($function);
+        x1000!($function);
+        x1000!($function);
+        x1000!($function);
+        x1000!($function);
 
-        x1000!($function);    
-        x1000!($function);    
-        x1000!($function);    
-        x1000!($function);    
-        x1000!($function);    
+        x1000!($function);
+        x1000!($function);
+        x1000!($function);
+        x1000!($function);
+        x1000!($function);
     };
 }
 
@@ -83,13 +83,11 @@ pub fn add_i128() {
     })
 }
 
-
 pub fn add_i64() {
     body(|| {
         std::hint::black_box(NUM_I64 + 76);
     })
 }
-
 
 pub fn add_i32() {
     body(|| {

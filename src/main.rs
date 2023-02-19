@@ -1,4 +1,4 @@
-use std::{time::Instant, any::type_name, collections::HashMap};
+use std::{any::type_name, collections::HashMap, time::Instant};
 
 mod tests;
 
@@ -10,14 +10,13 @@ struct Test {
     pub ops_pro_ns: f64,
 }
 
-
 macro_rules! call_for_each_type {
     ($func: ident $(, $t: ty)+) => {
         {
             let mut tests: Vec<Test> = Vec::new();
-    
-            $(tests.append(&mut $func::<$t>());)+ 
-            
+
+            $(tests.append(&mut $func::<$t>());)+
+
             tests
         }
     };
@@ -67,16 +66,21 @@ fn run_basic_ops<T>() -> Vec<Test> {
             "substract" => '-',
             "divide" => '/',
             "multiply" => '*',
-            _ => ' '
-        }; 
-        tests.push(Test { op: op_char, typ: t_name, ops_pro_ns });
+            _ => ' ',
+        };
+        tests.push(Test {
+            op: op_char,
+            typ: t_name,
+            ops_pro_ns,
+        });
     }
 
     tests
 }
 
 fn main() {
-    let mut tests: Vec<Test> = call_for_each_type!(run_basic_ops, i128, i64, i32, i16, i8, f64, f32);
+    let mut tests: Vec<Test> =
+        call_for_each_type!(run_basic_ops, i128, i64, i32, i16, i8, f64, f32);
 
     let max = tests.iter().map(|t| t.ops_pro_ns).reduce(f64::max).unwrap();
 
@@ -116,4 +120,3 @@ where
     func();
     now.elapsed().as_nanos() as u64
 }
-
