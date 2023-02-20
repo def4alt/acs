@@ -3,23 +3,23 @@ use std::ops::{Add, Div, Mul, Sub};
 use num_traits::{one, Bounded, Num};
 
 macro_rules! x10 {
-    ($function:ident) => {
-        std::hint::black_box($function());
-        std::hint::black_box($function());
-        std::hint::black_box($function());
-        std::hint::black_box($function());
-        std::hint::black_box($function());
+    ($function:expr) => {
+        $function();
+        $function();
+        $function();
+        $function();
+        $function();
 
-        std::hint::black_box($function());
-        std::hint::black_box($function());
-        std::hint::black_box($function());
-        std::hint::black_box($function());
-        std::hint::black_box($function());
+        $function();
+        $function();
+        $function();
+        $function();
+        $function();
     };
 }
 
 macro_rules! x100 {
-    ($function:ident) => {
+    ($function:expr) => {
         x10!($function);
         x10!($function);
         x10!($function);
@@ -31,38 +31,6 @@ macro_rules! x100 {
         x10!($function);
         x10!($function);
         x10!($function);
-    };
-}
-
-macro_rules! x1000 {
-    ($function:ident) => {
-        x100!($function);
-        x100!($function);
-        x100!($function);
-        x100!($function);
-        x100!($function);
-
-        x100!($function);
-        x100!($function);
-        x100!($function);
-        x100!($function);
-        x100!($function);
-    };
-}
-
-macro_rules! x10000 {
-    ($function:ident) => {
-        x1000!($function);
-        x1000!($function);
-        x1000!($function);
-        x1000!($function);
-        x1000!($function);
-
-        x1000!($function);
-        x1000!($function);
-        x1000!($function);
-        x1000!($function);
-        x1000!($function);
     };
 }
 
@@ -70,14 +38,22 @@ pub fn body<F>(func: F)
 where
     F: Fn(),
 {
-    x10000!(func);
+    for _ in 1..1000 {
+        func();
+    }
+}
+
+pub fn mock() {
+    body(|| {
+        std::hint::black_box(0);
+    });
 }
 
 pub fn add<T: Num + Add<Output = T> + Copy + Div<Output = T> + Bounded>() {
     let max = <T>::max_value() / (one::<T>() + one::<T>() + one::<T>() + one::<T>() + one::<T>());
     let value = one::<T>() + one::<T>() + one::<T>() + one::<T>() + one::<T>();
     body(|| {
-        std::hint::black_box(max + value);
+        x100!(|| { std::hint::black_box(max + value) });
     })
 }
 
@@ -85,7 +61,7 @@ pub fn substract<T: Num + Add<Output = T> + Copy + Div<Output = T> + Sub<Output 
     let max = <T>::max_value();
     let value = one::<T>() + one::<T>() + one::<T>() + one::<T>() + one::<T>();
     body(|| {
-        std::hint::black_box(max - value);
+        x100!(|| { std::hint::black_box(max - value) });
     })
 }
 
@@ -93,7 +69,7 @@ pub fn divide<T: Num + Add<Output = T> + Copy + Div<Output = T> + Bounded>() {
     let max = <T>::max_value();
     let value = one::<T>() + one::<T>() + one::<T>() + one::<T>() + one::<T>();
     body(|| {
-        std::hint::black_box(max / value);
+        x100!(|| { std::hint::black_box(max / value) });
     })
 }
 
@@ -101,6 +77,6 @@ pub fn multiply<T: Num + Add<Output = T> + Copy + Div<Output = T> + Mul<Output =
     let max = <T>::max_value() / (one::<T>() + one::<T>() + one::<T>() + one::<T>() + one::<T>());
     let value = one::<T>() + one::<T>();
     body(|| {
-        std::hint::black_box(max * value);
+        x100!(|| { std::hint::black_box(max * value) });
     })
 }

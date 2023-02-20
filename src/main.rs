@@ -11,24 +11,24 @@ struct Test {
     pub ops_pro_ns: f64,
 }
 
-macro_rules! call_for_each_type {
-    ($func: ident $(, $t: ty)+) => {
+macro_rules! test_for_each_type {
+    ($($t: ty), +) => {
         {
             let mut tests: Vec<Test> = Vec::new();
 
-            $(tests.append(&mut $func::<$t>());)+
+            $(tests.append(&mut test_basic_ops::<$t>());)+
 
             tests
         }
     };
 }
 
-fn run_basic_ops<T: Num + Copy + Bounded>() -> Vec<Test> {
-    let mut tests = Vec::new();
+fn test_basic_ops<T: Num + Copy + Bounded>() -> Vec<Test> {
     let t_name = type_name::<T>();
 
-    for op in "+-/*".chars() {
-        let test = match op {
+    "+-/*"
+        .chars()
+        .map(|op| match op {
             '+' => Test {
                 op,
                 typ: t_name,
@@ -49,30 +49,14 @@ fn run_basic_ops<T: Num + Copy + Bounded>() -> Vec<Test> {
                 typ: t_name,
                 ops_pro_ns: get_ops_pro_ns(multiply::<T>),
             },
-            _ => panic!(),
-        };
-        tests.push(test);
-    }
-
-    tests
+            _ => todo!(),
+        })
+        .collect()
 }
 
 fn main() {
-    let mut tests: Vec<Test> = call_for_each_type!(
-        run_basic_ops,
-        i128,
-        i64,
-        i32,
-        i16,
-        i8,
-        u128,
-        u64,
-        u32,
-        u16,
-        u8,
-        f64,
-        f32
-    );
+    let mut tests: Vec<Test> =
+        test_for_each_type!(i128, i64, i32, i16, i8, u128, u64, u32, u16, u8, f64, f32);
 
     let max = tests.iter().map(|t| t.ops_pro_ns).reduce(f64::max).unwrap();
 
@@ -97,7 +81,7 @@ where
     let mut sum = 0;
 
     for _ in 1..10 {
-        sum += get_function_duration(&func);
+        sum += get_function_duration(&func) - get_mock_duration();
     }
 
     let average = sum as f64 / 10.0;
@@ -111,4 +95,8 @@ where
     let now = Instant::now();
     func();
     now.elapsed().as_nanos() as u64
+}
+
+fn get_mock_duration() -> u64 {
+    get_function_duration(mock)
 }
