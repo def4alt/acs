@@ -1,50 +1,50 @@
 use std::{any::type_name, time::Instant};
 
-mod tests;
+mod benchmarks;
 
+use benchmarks::*;
 use num_traits::{Bounded, Num};
-use tests::*;
 
-struct Test {
+struct Benchmark {
     pub op: char,
     pub typ: &'static str,
     pub ops_pro_ns: f64,
 }
 
-macro_rules! test_for_each_type {
+macro_rules! benchmark_for_each_type {
     ($($t: ty), +) => {
         {
-            let mut tests: Vec<Test> = Vec::new();
+            let mut benchmarks: Vec<Benchmark> = Vec::new();
 
-            $(tests.append(&mut test_basic_ops::<$t>());)+
+            $(benchmarks.append(&mut benchmark_basic_ops::<$t>());)+
 
-            tests
+            benchmarks
         }
     };
 }
 
-fn test_basic_ops<T: Num + Copy + Bounded>() -> Vec<Test> {
+fn benchmark_basic_ops<T: Num + Copy + Bounded>() -> Vec<Benchmark> {
     let t_name = type_name::<T>();
 
     "+-/*"
         .chars()
         .map(|op| match op {
-            '+' => Test {
+            '+' => Benchmark {
                 op,
                 typ: t_name,
                 ops_pro_ns: get_ops_pro_ns(add::<T>),
             },
-            '-' => Test {
+            '-' => Benchmark {
                 op,
                 typ: t_name,
                 ops_pro_ns: get_ops_pro_ns(substract::<T>),
             },
-            '/' => Test {
+            '/' => Benchmark {
                 op,
                 typ: t_name,
                 ops_pro_ns: get_ops_pro_ns(divide::<T>),
             },
-            '*' => Test {
+            '*' => Benchmark {
                 op,
                 typ: t_name,
                 ops_pro_ns: get_ops_pro_ns(multiply::<T>),
@@ -55,21 +55,25 @@ fn test_basic_ops<T: Num + Copy + Bounded>() -> Vec<Test> {
 }
 
 fn main() {
-    let mut tests: Vec<Test> =
-        test_for_each_type!(i128, i64, i32, i16, i8, u128, u64, u32, u16, u8, f64, f32);
+    let mut benchmarks: Vec<Benchmark> =
+        benchmark_for_each_type!(i128, i64, i32, i16, i8, u128, u64, u32, u16, u8, f64, f32);
 
-    let max = tests.iter().map(|t| t.ops_pro_ns).reduce(f64::max).unwrap();
+    let max = benchmarks
+        .iter()
+        .map(|t| t.ops_pro_ns)
+        .reduce(f64::max)
+        .unwrap();
 
-    tests.sort_by_key(|k| k.op);
+    benchmarks.sort_by_key(|k| k.op);
 
-    for test in tests.iter() {
+    for benchmark in benchmarks.iter() {
         println!(
             "{:<5} {:<5} {:>10.3} * 10^7 \t {:<40} {:.0}%",
-            test.op,
-            test.typ,
-            test.ops_pro_ns * 100.0,
-            "X".repeat((test.ops_pro_ns * 35.0 / max) as usize),
-            test.ops_pro_ns * 100.0 / max
+            benchmark.op,
+            benchmark.typ,
+            benchmark.ops_pro_ns * 100.0,
+            "X".repeat((benchmark.ops_pro_ns * 35.0 / max) as usize),
+            benchmark.ops_pro_ns * 100.0 / max
         );
     }
 }
